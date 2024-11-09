@@ -1,0 +1,50 @@
+name: CI/CD Pipeline
+
+# Specifies when the workflow should run
+on:
+  push:
+    branches:
+      - main  # Run the workflow on pushes to the main branch
+  pull_request:
+    branches:
+      - main  # Run the workflow on pull requests to the main branch
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest  # Run the job on the latest Ubuntu version
+
+    steps:
+      # Step 1: Check out the code
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Ruby
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.6'  # Specify your Ruby version here if using Ruby
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      # Step 4: Run Cucumber tests
+      - name: Run Cucumber tests
+        run: bundle exec cucumber
+
+  deploy:
+    needs: build-and-test  # Run this job only if build-and-test passes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      # Step 1: Check out the code
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      # Step 2: Deployment step (dummy example)
+      - name: Deploy to production
+        run: echo "Deploying to production"  # Replace with your deployment command
+
